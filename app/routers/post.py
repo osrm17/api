@@ -31,10 +31,12 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), user_id : int = Depends(oauth2.get_current_user)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user : models.User = Depends(oauth2.get_current_user)):
     deleted_post = db.query(models.Post).filter(models.Post.id == id).first()
     if not deleted_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
+    if deleted_post.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorized to perform requested action")
     db.delete(deleted_post)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -42,9 +44,11 @@ def delete_post(id: int, db: Session = Depends(get_db), user_id : int = Depends(
 @router.put("/{id}", response_model=schemas.Post)
 def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db), current_user : models.User = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
-    u_post = post_query.first()
-    if not u_post:
+    post_registry = post_query.first()
+    if not post_registry:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
+    if post_registry.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorized to perform requested action")
     post_query.update(post.model_dump(),synchronize_session=False)
     db.commit()
     updated_post = post_query.first()
