@@ -1,11 +1,3 @@
-CREATE TABLE IF NOT EXISTS posts (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(200) NOT NULL,
-  content TEXT NOT NULL,
-  published BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
@@ -13,8 +5,15 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-INSERT INTO posts (title, content, published)
-VALUES
-  ('First post', 'Welcome to the blog', TRUE),
-  ('Second post', 'Another example post', TRUE),
-  ('Draft post', 'Work in progress', FALSE);
+CREATE TABLE IF NOT EXISTS posts (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  content TEXT NOT NULL,
+  published BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  user_id INTEGER NOT NULL,
+  CONSTRAINT posts_user_id_fkey
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+
+);
