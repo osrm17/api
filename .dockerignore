@@ -1,0 +1,32 @@
+# VCS
+.git
+.gitignore
+
+# Python cache / artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtualenv / local env
+.venv/
+venv/
+ENV/
+env/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Environment files (no meter secretos en la imagen)
+.env
+.env.*
+
+# Docker / compose local volumes (por si existen en el repo)
+db_data/
+*.log
